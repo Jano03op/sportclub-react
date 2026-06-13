@@ -1,0 +1,37 @@
+body {
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-color: #f5f7fb;
+}
+
+/* ── Temas por rol ──
+   Cada layout envuelve su contenido con una clase .theme-* que define el
+   color principal del rol. El navbar y los botones primarios lo heredan. */
+.theme-user  { --sc-theme: #1d4ed8; --sc-theme-dark: #1e40af; } /* azul */
+.theme-coach { --sc-theme: #15803d; --sc-theme-dark: #14532d; } /* verde */
+.theme-admin { --sc-theme: #7c3aed; --sc-theme-dark: #6d28d9; } /* púrpura */
+
+/* Header y navegación con el color del rol */
+.sc-navbar {
+  background-color: var(--sc-theme, #1e293b);
+}
+
+/* Los botones primarios dentro de cada tema toman el color del rol
+   sobreescribiendo las variables CSS de Bootstrap 5.3.
+   El Modal de react-bootstrap se monta en un portal fuera del layout,
+   así que no hereda el tema: como el único modal es el de Gestión de
+   Usuarios (admin), se le asigna el color púrpura directamente. */
+.modal { --sc-theme: #7c3aed; --sc-theme-dark: #6d28d9; }
+
+.theme-user .btn-primary,
+.theme-coach .btn-primary,
+.theme-admin .btn-primary,
+.modal .btn-primary {
+  --bs-btn-bg: var(--sc-theme);
+  --bs-btn-border-color: var(--sc-theme);
+  --bs-btn-hover-bg: var(--sc-theme-dark);
+  --bs-btn-hover-border-color: var(--sc-theme-dark);
+  --bs-btn-active-bg: var(--sc-theme-dark);
+  --bs-btn-active-border-color: var(--sc-theme-dark);
+  --bs-btn-disabled-bg: var(--sc-theme);
+  --bs-btn-disabled-border-color: var(--sc-theme);
+}
