@@ -1,22 +1,19 @@
-import { authApi } from './api';
+import { authApi, getToken } from './api';
 
-export const authService = {
-  async login(email, password) {
-    const res = await authApi.login({ email, password });
-    localStorage.setItem('token', res.data.token);
-    return res.data.user;
-  },
+export async function login(email, password) {
+  const res = await authApi.login({ email, password });
+  localStorage.setItem('token', res.data.token);
+  return res.data.user;
+}
 
-  logout() {
-    localStorage.removeItem('token');
-  },
+export function logout() {
+  localStorage.removeItem('token');
+}
 
-  getToken() {
-    return localStorage.getItem('token');
-  },
+export async function fetchCurrentUser() {
+  const res = await authApi.me();
+  return res.data;
+}
 
-  async fetchCurrentUser() {
-    const res = await authApi.me();
-    return res.data;
-  },
-};
+// getToken vive en api.js (única fuente); se reexporta para los consumidores de auth
+export { getToken };

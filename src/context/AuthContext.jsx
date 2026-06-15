@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { authService } from '../services/authService';
+import * as authService from '../services/authService';
 import { AuthContext } from './useAuth';
 
 export function AuthProvider({ children }) {
