@@ -39,3 +39,12 @@ export const usersApi = {
   update: (id, body) => request(`/users/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
   remove: (id) => request(`/users/${id}`, { method: 'DELETE' }),
 };
+
+export const sportsApi = {
+  getAll: () => request('/sport'),
+  getById: (id) => request(`/sport/${id}`),
+  create: (body) => request('/sport', { method: 'POST', body: JSON.stringify(body) }),
+  update: (id, body) => request(`/sport/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+  remove: (id) => request(`/sport/${id}`, { method: 'DELETE' }),
+  changeStatus: (id, status) => request(`/sport/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+};

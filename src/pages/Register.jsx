@@ -12,8 +12,8 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function Register() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ full_name: '', email: '', password: '', confirm_password: '' });
-  const [fieldErrors, setFieldErrors] = useState({ full_name: '', email: '', password: '', confirm_password: '' });
+  const [form, setForm] = useState({ full_name: '', email: '', password: '', confirm_password: '', birth_date: '' });
+  const [fieldErrors, setFieldErrors] = useState({ full_name: '', email: '', password: '', confirm_password: '', birth_date: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -24,7 +24,7 @@ export default function Register() {
   }
 
   function validate() {
-    const errors = { full_name: '', email: '', password: '', confirm_password: '' };
+    const errors = { full_name: '', email: '', password: '', confirm_password: '', birth_date: '' };
     let valid = true;
 
     if (form.full_name.trim().length < 3) {
@@ -50,6 +50,15 @@ export default function Register() {
       valid = false;
     }
 
+    if (form.birth_date) {
+      const today = new Date();
+      const birth = new Date(form.birth_date);
+      if (birth >= today) {
+        errors.birth_date = 'La fecha de nacimiento debe ser anterior a hoy.';
+        valid = false;
+      }
+    }
+
     setFieldErrors(errors);
     return valid;
   }
@@ -64,6 +73,7 @@ export default function Register() {
         full_name: form.full_name.trim(),
         email: form.email.trim().toLowerCase(),
         password: form.password,
+        ...(form.birth_date && { birth_date: form.birth_date }),
       });
       navigate('/login');
     } catch (err) {
@@ -137,6 +147,19 @@ export default function Register() {
                 isInvalid={!!fieldErrors.confirm_password}
               />
               <Form.Control.Feedback type="invalid">{fieldErrors.confirm_password}</Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="birth_date">
+              <Form.Label>Fecha de nacimiento <span className="text-muted">(opcional)</span></Form.Label>
+              <Form.Control
+                type="date"
+                name="birth_date"
+                value={form.birth_date}
+                onChange={handleChange}
+                max={new Date().toISOString().split('T')[0]}
+                isInvalid={!!fieldErrors.birth_date}
+              />
+              <Form.Control.Feedback type="invalid">{fieldErrors.birth_date}</Form.Control.Feedback>
             </Form.Group>
 
             <Button type="submit" variant="primary" className="w-100" disabled={loading}>

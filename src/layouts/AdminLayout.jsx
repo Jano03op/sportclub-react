@@ -9,6 +9,7 @@ export default function AdminLayout() {
         links={[
           { to: '/admin/dashboard', label: 'Dashboard' },
           { to: '/admin/users', label: 'Usuarios' },
+          { to: '/admin/sports', label: 'Deportes' },
         ]}
         roleLabel="Admin"
         profileTo="/admin/dashboard"
