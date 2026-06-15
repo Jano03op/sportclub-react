@@ -70,7 +70,8 @@ src/
 │   └── users/
 │       └── UserFormModal.jsx
 ├── context/
-│   └── AuthContext.jsx
+│   ├── AuthContext.jsx
+│   └── useAuth.js
 ├── layouts/
 │   ├── AdminLayout.jsx
 │   ├── CoachLayout.jsx
@@ -89,7 +90,6 @@ src/
 │       └── UserDashboard.jsx
 ├── routes/
 │   ├── AppRoutes.jsx
-│   ├── ProtectedRoute.jsx
 │   └── RoleRoute.jsx
 ├── services/
 │   ├── api.js

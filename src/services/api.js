@@ -1,6 +1,6 @@
 const BASE_URL = 'http://localhost:3000/api';
 
-function getToken() {
+export function getToken() {
   return localStorage.getItem('token');
 }
 
