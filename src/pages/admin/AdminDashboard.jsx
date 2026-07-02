@@ -180,7 +180,7 @@ export default function AdminDashboard() {
               <h5 className="mb-0">Resumen del sistema</h5>
             </Card.Header>
             <Card.Body>
-              <div className="d-flex justify-content-between align-items-center border-bottom py-2">
+              <div className="d-flex justify-content-between align-items-center py-2">
                 <span>Usuarios por rol</span>
                 <span className="d-flex gap-1">
                   <Badge bg="primary">{roleCount('user')} usuarios</Badge>
@@ -188,19 +188,19 @@ export default function AdminDashboard() {
                   <Badge bg="danger">{roleCount('admin')} admins</Badge>
                 </span>
               </div>
-              <div className="d-flex justify-content-between align-items-center border-bottom py-2">
+              <div className="d-flex justify-content-between align-items-center py-2">
                 <span>Deportes inactivos</span>
                 <Badge bg={sports.length - activeCount(sports) ? 'warning' : 'success'} text="dark">
                   {sports.length - activeCount(sports)}
                 </Badge>
               </div>
-              <div className="d-flex justify-content-between align-items-center border-bottom py-2">
+              <div className="d-flex justify-content-between align-items-center py-2">
                 <span>Salas inactivas</span>
                 <Badge bg={rooms.length - activeCount(rooms) ? 'warning' : 'success'} text="dark">
                   {rooms.length - activeCount(rooms)}
                 </Badge>
               </div>
-              <div className="d-flex justify-content-between align-items-center border-bottom py-2">
+              <div className="d-flex justify-content-between align-items-center py-2">
                 <span>Asignaciones sin horarios</span>
                 <Badge
                   bg={
