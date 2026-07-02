@@ -1,7 +1,7 @@
 import { usersApi } from './api'
 
-export async function getUsers() {
-  const res = await usersApi.getAll()
+export async function getUsers(filters = {}) {
+  const res = await usersApi.getAll(filters)
   return res.data
 }
 

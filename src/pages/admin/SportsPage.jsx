@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Badge, Button, Card, Form, Spinner, Table } from 'react-bootstrap'
+import { Badge, Button, Card, Col, Form, Row, Spinner, Table } from 'react-bootstrap'
 import Swal from 'sweetalert2'
 import { showApiError } from '../../utils/alerts'
+import { formatDate } from '../../utils/format'
 import SportFormModal from '../../components/sports/SportFormModal'
 import {
   changeSportStatus,
@@ -11,24 +12,12 @@ import {
   updateSport,
 } from '../../services/sportService'
 
-function formatDate(dateStr) {
-  const date = new Date(dateStr)
-  const formatted = date.toLocaleDateString('es-ES', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-  })
-  return formatted.replace(
-    / de ([a-záéíóúñ]+) de /i,
-    (_, month) => ` de ${month.charAt(0).toUpperCase()}${month.slice(1)} de `
-  )
-}
-
 function SportsPage() {
   const [sports, setSports] = useState([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [selectedSport, setSelectedSport] = useState(null)
+  const [search, setSearch] = useState('')
 
   const loadSports = () =>
     getSports()
@@ -44,6 +33,10 @@ function SportsPage() {
   useEffect(() => {
     loadSports()
   }, [])
+
+  const filteredSports = sports.filter((sport) =>
+    `${sport.name} ${sport.objective}`.toLowerCase().includes(search.toLowerCase())
+  )
 
   const openCreateModal = () => {
     setSelectedSport(null)
@@ -114,16 +107,34 @@ function SportsPage() {
 
   return (
     <Card className="shadow-sm">
-      <Card.Header className="d-flex justify-content-between align-items-center">
-        <h4 className="mb-0">Gestión de Deportes</h4>
-        <div className="d-flex gap-2">
-          <Button variant="outline-secondary" onClick={reloadSports}>
-            Refrescar
-          </Button>
-          <Button variant="primary" onClick={openCreateModal}>
-            Nuevo Deporte
-          </Button>
-        </div>
+      <Card.Header>
+        <Row className="align-items-center g-2">
+          <Col xs={12} md>
+            <h4 className="mb-0 d-flex align-items-center gap-2">
+              Gestión de Deportes
+              <Badge bg="secondary" pill>
+                {filteredSports.length}
+              </Badge>
+            </h4>
+          </Col>
+          <Col xs={12} md="auto">
+            <div className="d-flex flex-wrap gap-2">
+              <Form.Control
+                type="search"
+                placeholder="Buscar por nombre u objetivo..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                style={{ minWidth: 250 }}
+              />
+              <Button variant="outline-secondary" onClick={reloadSports}>
+                Refrescar
+              </Button>
+              <Button variant="primary" onClick={openCreateModal}>
+                Nuevo Deporte
+              </Button>
+            </div>
+          </Col>
+        </Row>
       </Card.Header>
       <Card.Body>
         {loading ? (
@@ -132,38 +143,51 @@ function SportsPage() {
             <p className="mt-2">Cargando deportes...</p>
           </div>
         ) : (
-          <Table responsive striped bordered hover>
-            <thead>
+          <Table responsive striped bordered hover className="align-middle">
+            <thead className="table-light">
               <tr>
                 <th>ID</th>
                 <th>Nombre</th>
                 <th>Objetivo</th>
-                <th>Duración (min)</th>
-                <th>Estado</th>
+                <th className="text-center">Duración</th>
+                <th className="text-center">Estado</th>
                 <th>Fecha de Creación</th>
-                <th>Acciones</th>
+                <th className="text-center">Acciones</th>
               </tr>
             </thead>
             <tbody>
-              {sports.length === 0 ? (
+              {filteredSports.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="text-center text-muted py-4">
-                    Sin deportes registrados
+                    {sports.length === 0
+                      ? 'Sin deportes registrados. Crea el primero con "Nuevo Deporte".'
+                      : `Sin resultados para "${search}".`}
                   </td>
                 </tr>
               ) : (
-                sports.map((sport) => (
+                filteredSports.map((sport) => (
                   <tr key={sport.id}>
                     <td>{sport.id}</td>
-                    <td>{sport.name}</td>
-                    <td>{sport.objective}</td>
-                    <td>{sport.duration}</td>
-                    <td>
+                    <td className="fw-semibold">{sport.name}</td>
+                    <td
+                      className="text-truncate"
+                      style={{ maxWidth: 260 }}
+                      title={sport.objective}
+                    >
+                      {sport.objective}
+                    </td>
+                    <td className="text-center">
+                      <Badge bg="info" text="dark">
+                        {sport.duration} min
+                      </Badge>
+                    </td>
+                    <td className="text-center">
                       <Form.Check
                         type="switch"
                         id={`status-switch-${sport.id}`}
                         checked={sport.status}
                         onChange={() => handleStatusChange(sport)}
+                        className="d-inline-block"
                         label={
                           <Badge bg={sport.status ? 'success' : 'secondary'}>
                             {sport.status ? 'Activo' : 'Inactivo'}
@@ -172,7 +196,7 @@ function SportsPage() {
                       />
                     </td>
                     <td>{formatDate(sport.created_at)}</td>
-                    <td>
+                    <td className="text-center text-nowrap">
                       <Button
                         variant="warning"
                         size="sm"

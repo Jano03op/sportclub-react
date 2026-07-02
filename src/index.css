@@ -1,37 +1,237 @@
+/* ══════════════════════════════════════════════════════════════════
+   Design System: "SportClub"
+   Adaptación del design.md sobre Bootstrap 5 / React Bootstrap.
+
+   Principios aplicados:
+   - Púrpura profundo (#2E1A47) como ancla + dorado (#F2B705) como chispa.
+   - Regla "sin líneas": los límites se marcan con capas tonales
+     (surface → surface_low → surface_lowest), no con bordes de 1px.
+   - Profundidad ambiental: sombras muy difusas, nunca negro puro.
+   - Lexend en toda la app: titulares con tracking -0.02em,
+     etiquetas en mayúsculas con tracking +0.05em.
+   - Acentos de identidad por rol: azul (user), verde (coach),
+     rojo/púrpura (admin) como barras de acento superiores.
+   ══════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Colores núcleo */
+  --kv-primary: #180331;
+  --kv-primary-container: #2e1a47;
+  --kv-gold: #f2b705;
+  --kv-on-surface: #1a1c1c;
+  --kv-on-surface-muted: #5b5566;
+
+  /* Jerarquía de superficies (capas de material) */
+  --kv-surface: #f9f9f9;          /* capa base */
+  --kv-surface-low: #f3f3f4;      /* capa de sección */
+  --kv-surface-lowest: #ffffff;   /* capa de componente (cards) */
+
+  /* Sombra ambiental difusa: on_surface al 6%, nunca negro puro */
+  --kv-ambient-shadow: 0 8px 24px rgba(26, 28, 28, 0.06);
+
+  /* "Ghost border": outline al 15% para cuando un borde sea inevitable */
+  --kv-ghost-border: rgba(46, 26, 71, 0.15);
+
+  /* Gradiente de firma a 45° para CTAs, navbar y hero */
+  --kv-gradient: linear-gradient(45deg, var(--kv-primary), var(--kv-primary-container));
+}
+
 body {
-  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background-color: #f5f7fb;
+  font-family: 'Lexend', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  background-color: var(--kv-surface);
+  color: var(--kv-on-surface);
 }
 
-/* ── Temas por rol ──
-   Cada layout envuelve su contenido con una clase .theme-* que define el
-   color principal del rol. El navbar y los botones primarios lo heredan. */
-.theme-user  { --sc-theme: #1d4ed8; --sc-theme-dark: #1e40af; } /* azul */
-.theme-coach { --sc-theme: #15803d; --sc-theme-dark: #14532d; } /* verde */
-.theme-admin { --sc-theme: #7c3aed; --sc-theme-dark: #6d28d9; } /* púrpura */
+/* ── Tipografía editorial ── */
+h1, h2, h3, h4, h5, h6,
+.modal-title,
+.display-6 {
+  letter-spacing: -0.02em;
+  font-weight: 600;
+}
 
-/* Header y navegación con el color del rol */
+/* ── Acentos de identidad por rol ──
+   Cada layout envuelve su contenido con .theme-*; el acento aparece
+   como barra superior en navbar y cards, no como color de relleno. */
+.theme-user  { --sc-accent: #2563eb; } /* azul */
+.theme-coach { --sc-accent: #16a34a; } /* verde */
+.theme-admin { --sc-accent: #c026d3; } /* rojo/púrpura */
+
+/* ── Navbar: gradiente de firma + barra de acento del rol ── */
 .sc-navbar {
-  background-color: var(--sc-theme, #1e293b);
+  background: var(--kv-gradient);
+  border-bottom: 3px solid var(--sc-accent, var(--kv-gold));
 }
 
-/* Los botones primarios dentro de cada tema toman el color del rol
-   sobreescribiendo las variables CSS de Bootstrap 5.3.
-   El Modal de react-bootstrap se monta en un portal fuera del layout,
-   así que no hereda el tema: como el único modal es el de Gestión de
-   Usuarios (admin), se le asigna el color púrpura directamente. */
-.modal { --sc-theme: #7c3aed; --sc-theme-dark: #6d28d9; }
+.sc-navbar .nav-link {
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
 
-.theme-user .btn-primary,
-.theme-coach .btn-primary,
-.theme-admin .btn-primary,
-.modal .btn-primary {
-  --bs-btn-bg: var(--sc-theme);
-  --bs-btn-border-color: var(--sc-theme);
-  --bs-btn-hover-bg: var(--sc-theme-dark);
-  --bs-btn-hover-border-color: var(--sc-theme-dark);
-  --bs-btn-active-bg: var(--sc-theme-dark);
-  --bs-btn-active-border-color: var(--sc-theme-dark);
-  --bs-btn-disabled-bg: var(--sc-theme);
-  --bs-btn-disabled-border-color: var(--sc-theme);
+.sc-navbar .nav-link:hover,
+.sc-navbar .nav-link:focus {
+  color: var(--kv-gold);
+}
+
+.sc-navbar .navbar-text {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ── Cards: capa "lowest" sobre fondo, sin bordes, lift ambiental ── */
+.card {
+  border: 0;
+  border-radius: 0.5rem;
+  background-color: var(--kv-surface-lowest);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* La barra de acento identifica el rol dueño de la pantalla */
+.theme-user .card,
+.theme-coach .card,
+.theme-admin .card {
+  border-top: 3px solid var(--sc-accent);
+}
+
+.card-header {
+  background-color: var(--kv-surface-low);
+  border-bottom: 0;
+}
+
+/* Cards clicables (stat cards del dashboard): respuesta "cinética" */
+.card[role='button']:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(26, 28, 28, 0.1);
+}
+
+/* Sombras de Bootstrap reemplazadas por la ambiental del sistema */
+.shadow-sm,
+.shadow {
+  box-shadow: var(--kv-ambient-shadow) !important;
+}
+
+/* Sin divisores en listas: el espacio hace la separación */
+.list-group-item {
+  border: 0;
+  background-color: transparent;
+}
+
+/* ── Tablas: tonal, sin rejilla de 1px ── */
+.table {
+  --bs-table-striped-bg: var(--kv-surface-low);
+  border-color: transparent;
+}
+
+.table > :not(caption) > * > * {
+  border-bottom-width: 0;
+}
+
+.table-bordered > :not(caption) > *,
+.table-bordered > :not(caption) > * > * {
+  border-width: 0;
+}
+
+/* Encabezados de tabla como etiquetas técnicas (label-md en caps) */
+.table-light th {
+  background-color: var(--kv-surface-low);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--kv-on-surface-muted);
+}
+
+/* ── Botones ── */
+.btn {
+  border-radius: 0.5rem;
+  font-weight: 500;
+}
+
+/* CTA primario: gradiente de firma; el dorado aparece solo como
+   resplandor al interactuar (la "chispa" se usa con moderación) */
+.btn-primary {
+  background: var(--kv-gradient);
+  border: 0;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+  background: var(--kv-gradient);
+  box-shadow: 0 0 0 3px rgba(242, 183, 5, 0.4);
+}
+
+.btn-primary:disabled {
+  background: var(--kv-gradient);
+  opacity: 0.65;
+}
+
+/* Botón secundario: sin relleno ni borde; el hover es un cambio tonal */
+.btn-outline-secondary {
+  border-color: transparent;
+  color: var(--kv-primary-container);
+}
+
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus,
+.btn-outline-secondary:active {
+  background-color: #e7e5ea;
+  border-color: transparent;
+  color: var(--kv-primary);
+}
+
+/* ── Chips de estado: redondez total + estilo de etiqueta técnica ── */
+.badge {
+  border-radius: 50rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+/* ── Formularios: ghost border + foco con resplandor dorado ── */
+.form-control,
+.form-select {
+  border-radius: 0.5rem;
+  border-color: var(--kv-ghost-border);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--kv-primary-container);
+  box-shadow: 0 0 0 0.25rem rgba(242, 183, 5, 0.25);
+}
+
+/* ── Modales: glassmorphism con acento dorado ──
+   El fondo púrpura del backdrop "sangra" a través del vidrio. */
+.modal-content {
+  border: 0;
+  border-top: 3px solid var(--kv-gold);
+  border-radius: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.modal-header {
+  border-bottom: 0;
+}
+
+.modal-footer {
+  border-top: 0;
+}
+
+.modal-backdrop.show {
+  background-color: var(--kv-primary);
+  opacity: 0.55;
+}
+
+/* ── SweetAlert2 alineado al sistema ── */
+.swal2-popup {
+  font-family: 'Lexend', system-ui, sans-serif;
+  border-radius: 0.5rem;
+}
+
+.swal2-confirm,
+.swal2-cancel {
+  border-radius: 0.5rem !important;
 }

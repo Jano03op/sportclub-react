@@ -11,6 +11,9 @@ import CoachDashboard from '../pages/coach/CoachDashboard';
 import AdminDashboard from '../pages/admin/AdminDashboard';
 import UsersPage from '../pages/admin/UsersPage';
 import SportsPage from '../pages/admin/SportsPage';
+import RoomsPage from '../pages/admin/RoomsPage';
+import AssignmentsPage from '../pages/admin/AssignmentsPage';
+import SchedulesPage from '../pages/admin/SchedulesPage';
 
 import UserLayout from '../layouts/UserLayout';
 import CoachLayout from '../layouts/CoachLayout';
@@ -62,6 +65,9 @@ export default function AppRoutes() {
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="users" element={<UsersPage />} />
           <Route path="sports" element={<SportsPage />} />
+          <Route path="rooms" element={<RoomsPage />} />
+          <Route path="assignments" element={<AssignmentsPage />} />
+          <Route path="schedules" element={<SchedulesPage />} />
           <Route path="profile" element={<ProfilePage />} />
         </Route>
 

@@ -17,7 +17,15 @@ export function getErrorMessages(error) {
   }
 
   if (messages.length === 0) {
-    messages.push(error?.message || 'Ocurrió un error inesperado. Intenta nuevamente.');
+    if (error?.status >= 500) {
+      // Los errores 500 traen mensajes técnicos que no ayudan al usuario
+      messages.push('Ocurrió un error en el servidor. Intenta nuevamente en unos segundos.');
+    } else if (error?.status) {
+      messages.push(error.message || 'Ocurrió un error inesperado. Intenta nuevamente.');
+    } else {
+      // Sin status = la petición nunca llegó (backend caído o sin conexión)
+      messages.push('No se pudo conectar con el servidor. Verifica tu conexión o que el backend esté en ejecución.');
+    }
   }
 
   return messages;

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Badge, Button, Card, Spinner, Table } from 'react-bootstrap'
+import { Badge, Button, Card, Col, Form, Row, Spinner, Table } from 'react-bootstrap'
 import Swal from 'sweetalert2'
 import { showApiError } from '../../utils/alerts'
+import { formatDate } from '../../utils/format'
 import UserFormModal from '../../components/users/UserFormModal'
 import { createUser, deleteUser, getUsers, updateUser } from '../../services/userService'
 
@@ -10,6 +11,8 @@ function UsersPage() {
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [selectedUser, setSelectedUser] = useState(null)
+  const [search, setSearch] = useState('')
+  const [roleFilter, setRoleFilter] = useState('')
 
   // setUsers/setLoading se llaman en callbacks de la promesa (nunca de forma
   // síncrona), por eso es seguro usar loadUsers también dentro del efecto
@@ -28,6 +31,14 @@ function UsersPage() {
   useEffect(() => {
     loadUsers()
   }, [])
+
+  const filteredUsers = users.filter((user) => {
+    const matchesRole = !roleFilter || user.role === roleFilter
+    const matchesSearch = `${user.full_name} ${user.email}`
+      .toLowerCase()
+      .includes(search.toLowerCase())
+    return matchesRole && matchesSearch
+  })
 
   const openCreateModal = () => {
     setSelectedUser(null)
@@ -90,11 +101,45 @@ function UsersPage() {
 
   return (
     <Card className="shadow-sm">
-      <Card.Header className="d-flex justify-content-between align-items-center">
-        <h4 className="mb-0">Gestión de Usuarios</h4>
-        <Button variant="primary" onClick={openCreateModal}>
-          Nuevo Usuario
-        </Button>
+      <Card.Header>
+        <Row className="align-items-center g-2">
+          <Col xs={12} lg>
+            <h4 className="mb-0 d-flex align-items-center gap-2">
+              Gestión de Usuarios
+              <Badge bg="secondary" pill>
+                {filteredUsers.length}
+              </Badge>
+            </h4>
+          </Col>
+          <Col xs={12} lg="auto">
+            <div className="d-flex flex-wrap gap-2">
+              <Form.Select
+                value={roleFilter}
+                onChange={(e) => setRoleFilter(e.target.value)}
+                style={{ maxWidth: 180 }}
+                aria-label="Filtrar por rol"
+              >
+                <option value="">Todos los roles</option>
+                <option value="user">Usuario</option>
+                <option value="coach">Entrenador</option>
+                <option value="admin">Administrador</option>
+              </Form.Select>
+              <Form.Control
+                type="search"
+                placeholder="Buscar por nombre o correo..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                style={{ minWidth: 240 }}
+              />
+              <Button variant="outline-secondary" onClick={reloadUsers}>
+                Refrescar
+              </Button>
+              <Button variant="primary" onClick={openCreateModal}>
+                Nuevo Usuario
+              </Button>
+            </div>
+          </Col>
+        </Row>
       </Card.Header>
       <Card.Body>
         {loading ? (
@@ -103,35 +148,39 @@ function UsersPage() {
             <p className="mt-2">Cargando usuarios...</p>
           </div>
         ) : (
-          <Table responsive striped bordered hover>
-            <thead>
+          <Table responsive striped bordered hover className="align-middle">
+            <thead className="table-light">
               <tr>
                 <th>ID</th>
                 <th>Nombre</th>
                 <th>Correo</th>
-                <th>Rol</th>
-                <th>Acciones</th>
+                <th className="text-center">Rol</th>
+                <th>Registrado</th>
+                <th className="text-center">Acciones</th>
               </tr>
             </thead>
             <tbody>
-              {users.length === 0 ? (
+              {filteredUsers.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="text-center text-muted py-4">
-                    Sin usuarios registrados
+                  <td colSpan={6} className="text-center text-muted py-4">
+                    {users.length === 0
+                      ? 'Sin usuarios registrados. Crea el primero con "Nuevo Usuario".'
+                      : 'Sin resultados para la búsqueda o el filtro aplicado.'}
                   </td>
                 </tr>
               ) : (
-                users.map((user) => (
+                filteredUsers.map((user) => (
                   <tr key={user.id}>
                     <td>{user.id}</td>
-                    <td>{user.full_name}</td>
+                    <td className="fw-semibold">{user.full_name}</td>
                     <td>{user.email}</td>
-                    <td>
+                    <td className="text-center">
                       <Badge bg={roleBadge[user.role] || 'secondary'}>
                         {roleLabel[user.role] || user.role}
                       </Badge>
                     </td>
-                    <td>
+                    <td>{formatDate(user.created_at)}</td>
+                    <td className="text-center text-nowrap">
                       <Button
                         variant="warning"
                         size="sm"
