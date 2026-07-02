@@ -1,0 +1,189 @@
+import { useState } from 'react'
+import { Button, Form, Modal } from 'react-bootstrap'
+
+const initialForm = {
+  name: '',
+  description: '',
+  capacity: '',
+  location: '',
+  observation: '',
+  status: true,
+}
+
+function RoomFormModal({ show, handleClose, handleSave, selectedRoom }) {
+  const [formData, setFormData] = useState(() =>
+    selectedRoom
+      ? {
+          name: selectedRoom.name || '',
+          description: selectedRoom.description || '',
+          capacity: selectedRoom.capacity ?? '',
+          location: selectedRoom.location || '',
+          observation: selectedRoom.observation || '',
+          status: selectedRoom.status ?? true,
+        }
+      : initialForm
+  )
+  const [fieldErrors, setFieldErrors] = useState({})
+
+  const handleChange = (event) => {
+    const { name, value, type, checked } = event.target
+    setFormData({ ...formData, [name]: type === 'checkbox' ? checked : value })
+    setFieldErrors((prev) => ({ ...prev, [name]: '' }))
+  }
+
+  // Mismas reglas que el validador del backend, para avisar antes de enviar
+  const validate = () => {
+    const errors = {}
+    const name = formData.name.trim()
+    const description = formData.description.trim()
+    const capacity = Number(formData.capacity)
+
+    if (!name) {
+      errors.name = 'El nombre de la sala es obligatorio.'
+    } else if (name.length < 3) {
+      errors.name = `El nombre debe tener al menos 3 caracteres (llevas ${name.length}).`
+    } else if (name.length > 100) {
+      errors.name = 'El nombre no puede superar los 100 caracteres.'
+    }
+
+    if (!description) {
+      errors.description = 'La descripción es obligatoria.'
+    } else if (description.length < 5) {
+      errors.description = `La descripción debe tener al menos 5 caracteres (llevas ${description.length}).`
+    } else if (description.length > 255) {
+      errors.description = 'La descripción no puede superar los 255 caracteres.'
+    }
+
+    if (formData.capacity === '' || formData.capacity === null) {
+      errors.capacity = 'La capacidad es obligatoria.'
+    } else if (!Number.isInteger(capacity) || capacity < 1) {
+      errors.capacity = 'La capacidad debe ser un número entero mayor a 0.'
+    }
+
+    if (formData.observation.trim().length > 255) {
+      errors.observation = 'La observación no puede superar los 255 caracteres.'
+    }
+
+    setFieldErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+
+  const onSubmit = (event) => {
+    event.preventDefault()
+    if (!validate()) return
+
+    // Los opcionales se envían como string (vacío si no se escribió nada)
+    // para evitar errores del backend al validar null
+    handleSave({
+      name: formData.name.trim(),
+      description: formData.description.trim(),
+      capacity: Number(formData.capacity),
+      location: formData.location.trim(),
+      observation: formData.observation.trim(),
+      status: formData.status,
+    })
+  }
+
+  return (
+    <Modal show={show} onHide={handleClose} centered>
+      <Modal.Header closeButton>
+        <Modal.Title>{selectedRoom ? 'Editar Sala' : 'Nueva Sala'}</Modal.Title>
+      </Modal.Header>
+      <Form onSubmit={onSubmit} noValidate>
+        <Modal.Body>
+          <Form.Group className="mb-3">
+            <Form.Label>Nombre</Form.Label>
+            <Form.Control
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Ej: Sala Multiuso 1"
+              isInvalid={!!fieldErrors.name}
+            />
+            <Form.Control.Feedback type="invalid">
+              {fieldErrors.name}
+            </Form.Control.Feedback>
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Descripción</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={2}
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Ej: Sala equipada para clases grupales..."
+              isInvalid={!!fieldErrors.description}
+            />
+            <Form.Control.Feedback type="invalid">
+              {fieldErrors.description}
+            </Form.Control.Feedback>
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Capacidad (personas)</Form.Label>
+            <Form.Control
+              type="number"
+              name="capacity"
+              value={formData.capacity}
+              onChange={handleChange}
+              min="1"
+              placeholder="Ej: 20"
+              isInvalid={!!fieldErrors.capacity}
+            />
+            <Form.Control.Feedback type="invalid">
+              {fieldErrors.capacity}
+            </Form.Control.Feedback>
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>
+              Ubicación <span className="text-muted">(opcional)</span>
+            </Form.Label>
+            <Form.Control
+              type="text"
+              name="location"
+              value={formData.location}
+              onChange={handleChange}
+              placeholder="Ej: Piso 2, ala norte"
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>
+              Observación <span className="text-muted">(opcional)</span>
+            </Form.Label>
+            <Form.Control
+              type="text"
+              name="observation"
+              value={formData.observation}
+              onChange={handleChange}
+              isInvalid={!!fieldErrors.observation}
+            />
+            <Form.Control.Feedback type="invalid">
+              {fieldErrors.observation}
+            </Form.Control.Feedback>
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Check
+              type="switch"
+              id="room-status-modal"
+              name="status"
+              label={formData.status ? 'Activa' : 'Inactiva'}
+              checked={formData.status}
+              onChange={handleChange}
+            />
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Cancelar
+          </Button>
+          <Button variant="primary" type="submit">
+            Guardar
+          </Button>
+        </Modal.Footer>
+      </Form>
+    </Modal>
+  )
+}
+
+export default RoomFormModal

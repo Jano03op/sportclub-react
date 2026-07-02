@@ -10,11 +10,19 @@ async function request(path, options = {}) {
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
   const res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
-  const data = await res.json();
+
+  // Si la respuesta no es JSON válido (ej: error inesperado del servidor),
+  // se sigue adelante con data = null para no perder el status
+  let data;
+  try {
+    data = await res.json();
+  } catch {
+    data = null;
+  }
 
   if (!res.ok) {
-    const error = new Error(data.message || 'Error en la solicitud');
-    error.errors = data.errors;
+    const error = new Error(data?.message || `Error ${res.status} en la solicitud`);
+    error.errors = data?.errors;
     error.status = res.status;
     throw error;
   }
@@ -47,4 +55,29 @@ export const sportsApi = {
   update: (id, body) => request(`/sports/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
   remove: (id) => request(`/sports/${id}`, { method: 'DELETE' }),
   changeStatus: (id, status) => request(`/sports/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+};
+
+export const roomsApi = {
+  getAll: () => request('/rooms'),
+  getById: (id) => request(`/rooms/${id}`),
+  create: (body) => request('/rooms', { method: 'POST', body: JSON.stringify(body) }),
+  update: (id, body) => request(`/rooms/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+  remove: (id) => request(`/rooms/${id}`, { method: 'DELETE' }),
+};
+
+// Asignaciones Deporte + Sala + Coach
+export const sportRoomsApi = {
+  getAll: () => request('/sport-rooms'),
+  getById: (id) => request(`/sport-rooms/${id}`),
+  create: (body) => request('/sport-rooms', { method: 'POST', body: JSON.stringify(body) }),
+  update: (id, body) => request(`/sport-rooms/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+  remove: (id) => request(`/sport-rooms/${id}`, { method: 'DELETE' }),
+};
+
+export const schedulesApi = {
+  getAll: () => request('/class-schedules'),
+  getById: (id) => request(`/class-schedules/${id}`),
+  create: (body) => request('/class-schedules', { method: 'POST', body: JSON.stringify(body) }),
+  update: (id, body) => request(`/class-schedules/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+  remove: (id) => request(`/class-schedules/${id}`, { method: 'DELETE' }),
 };

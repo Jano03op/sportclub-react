@@ -10,6 +10,9 @@ export default function AdminLayout() {
           { to: '/admin/dashboard', label: 'Dashboard' },
           { to: '/admin/users', label: 'Usuarios' },
           { to: '/admin/sports', label: 'Deportes' },
+          { to: '/admin/rooms', label: 'Salas' },
+          { to: '/admin/assignments', label: 'Asignaciones' },
+          { to: '/admin/schedules', label: 'Horarios' },
         ]}
         roleLabel="Admin"
         profileTo="/admin/profile"
