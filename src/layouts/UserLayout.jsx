@@ -8,7 +8,7 @@ export default function UserLayout() {
       <DashboardNavbar
         links={[{ to: '/user/dashboard', label: 'Dashboard' }]}
         roleLabel="Usuario"
-        profileTo="/user/dashboard"
+        profileTo="/user/profile"
       />
       <Container className="py-4 flex-grow-1">
         <Outlet />

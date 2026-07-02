@@ -4,6 +4,7 @@ import Home from '../pages/Home';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
 import Recover from '../pages/Recover';
+import ProfilePage from '../pages/ProfilePage';
 
 import UserDashboard from '../pages/user/UserDashboard';
 import CoachDashboard from '../pages/coach/CoachDashboard';
@@ -35,6 +36,7 @@ export default function AppRoutes() {
           }
         >
           <Route path="dashboard" element={<UserDashboard />} />
+          <Route path="profile" element={<ProfilePage />} />
         </Route>
 
         <Route
@@ -46,6 +48,7 @@ export default function AppRoutes() {
           }
         >
           <Route path="dashboard" element={<CoachDashboard />} />
+          <Route path="profile" element={<ProfilePage />} />
         </Route>
 
         <Route
@@ -59,6 +62,7 @@ export default function AppRoutes() {
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="users" element={<UsersPage />} />
           <Route path="sports" element={<SportsPage />} />
+          <Route path="profile" element={<ProfilePage />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

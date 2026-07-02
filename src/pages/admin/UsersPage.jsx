@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Badge, Button, Card, Spinner, Table } from 'react-bootstrap'
 import Swal from 'sweetalert2'
+import { showApiError } from '../../utils/alerts'
 import UserFormModal from '../../components/users/UserFormModal'
 import { createUser, deleteUser, getUsers, updateUser } from '../../services/userService'
 
@@ -55,7 +56,10 @@ function UsersPage() {
       closeModal()
       reloadUsers()
     } catch (error) {
-      Swal.fire('Error', error.message, 'error')
+      showApiError(
+        error,
+        selectedUser ? 'No se pudo actualizar el usuario' : 'No se pudo crear el usuario'
+      )
     }
   }
 
@@ -76,7 +80,7 @@ function UsersPage() {
         Swal.fire('Eliminado', 'Usuario eliminado correctamente', 'success')
         reloadUsers()
       } catch (error) {
-        Swal.fire('Error', error.message, 'error')
+        showApiError(error, 'No se pudo eliminar el usuario')
       }
     }
   }

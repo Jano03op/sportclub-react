@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Badge, Button, Card, Form, Spinner, Table } from 'react-bootstrap'
 import Swal from 'sweetalert2'
+import { showApiError } from '../../utils/alerts'
 import SportFormModal from '../../components/sports/SportFormModal'
 import {
   changeSportStatus,
@@ -71,7 +72,10 @@ function SportsPage() {
       closeModal()
       reloadSports()
     } catch (error) {
-      Swal.fire('Error', error.message, 'error')
+      showApiError(
+        error,
+        selectedSport ? 'No se pudo actualizar el deporte' : 'No se pudo crear el deporte'
+      )
     }
   }
 
@@ -92,7 +96,7 @@ function SportsPage() {
         Swal.fire('Eliminado', 'Deporte eliminado correctamente.', 'success')
         reloadSports()
       } catch (error) {
-        Swal.fire('Error', error.message, 'error')
+        showApiError(error, 'No se pudo eliminar el deporte')
       }
     }
   }
@@ -104,7 +108,7 @@ function SportsPage() {
         prev.map((s) => (s.id === sport.id ? { ...s, status: !s.status } : s))
       )
     } catch (error) {
-      Swal.fire('Error', error.message, 'error')
+      showApiError(error, 'No se pudo cambiar el estado del deporte')
     }
   }
 

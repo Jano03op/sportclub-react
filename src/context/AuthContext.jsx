@@ -26,8 +26,13 @@ export function AuthProvider({ children }) {
     setUser(null);
   }
 
+  // Permite reflejar en toda la app (ej: navbar) los cambios hechos en Mi Perfil
+  function updateUser(updatedFields) {
+    setUser(prev => ({ ...prev, ...updatedFields }));
+  }
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

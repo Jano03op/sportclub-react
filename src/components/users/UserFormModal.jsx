@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Button, Form, Modal } from 'react-bootstrap'
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
 const initialForm = {
   full_name: '',
   email: '',
@@ -21,15 +23,57 @@ function UserFormModal({ show, handleClose, handleSave, selectedUser }) {
         }
       : initialForm
   )
+  const [fieldErrors, setFieldErrors] = useState({})
 
   const handleChange = (event) => {
     const { name, value } = event.target
     setFormData({ ...formData, [name]: value })
+    // Al corregir un campo, su mensaje de error desaparece de inmediato
+    setFieldErrors((prev) => ({ ...prev, [name]: '' }))
+  }
+
+  // Mismas reglas que el validador del backend, para avisar antes de enviar
+  const validate = () => {
+    const errors = {}
+    const fullName = formData.full_name.trim()
+    const email = formData.email.trim()
+
+    if (!fullName) {
+      errors.full_name = 'El nombre completo es obligatorio.'
+    } else if (fullName.length < 3) {
+      errors.full_name = 'El nombre debe tener al menos 3 caracteres.'
+    } else if (fullName.length > 150) {
+      errors.full_name = 'El nombre no puede superar los 150 caracteres.'
+    }
+
+    if (!email) {
+      errors.email = 'El correo es obligatorio.'
+    } else if (!EMAIL_REGEX.test(email)) {
+      errors.email = 'Ingresa un correo válido, por ejemplo: nombre@dominio.cl'
+    } else if (email.length > 150) {
+      errors.email = 'El correo no puede superar los 150 caracteres.'
+    }
+
+    if (!selectedUser) {
+      if (!formData.password) {
+        errors.password = 'La contraseña es obligatoria.'
+      } else if (formData.password.length < 8) {
+        errors.password = `La contraseña debe tener al menos 8 caracteres (llevas ${formData.password.length}).`
+      }
+    }
+
+    setFieldErrors(errors)
+    return Object.keys(errors).length === 0
   }
 
   const onSubmit = (event) => {
     event.preventDefault()
-    handleSave(formData)
+    if (!validate()) return
+    handleSave({
+      ...formData,
+      full_name: formData.full_name.trim(),
+      email: formData.email.trim().toLowerCase(),
+    })
   }
 
   return (
@@ -39,7 +83,7 @@ function UserFormModal({ show, handleClose, handleSave, selectedUser }) {
           {selectedUser ? 'Editar Usuario' : 'Nuevo Usuario'}
         </Modal.Title>
       </Modal.Header>
-      <Form onSubmit={onSubmit}>
+      <Form onSubmit={onSubmit} noValidate>
         <Modal.Body>
           <Form.Group className="mb-3">
             <Form.Label>Nombre Completo</Form.Label>
@@ -48,8 +92,12 @@ function UserFormModal({ show, handleClose, handleSave, selectedUser }) {
               name="full_name"
               value={formData.full_name}
               onChange={handleChange}
-              required
+              placeholder="Ej: Juan Pérez"
+              isInvalid={!!fieldErrors.full_name}
             />
+            <Form.Control.Feedback type="invalid">
+              {fieldErrors.full_name}
+            </Form.Control.Feedback>
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>Correo</Form.Label>
@@ -58,8 +106,12 @@ function UserFormModal({ show, handleClose, handleSave, selectedUser }) {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              required
+              placeholder="Ej: nombre@dominio.cl"
+              isInvalid={!!fieldErrors.email}
             />
+            <Form.Control.Feedback type="invalid">
+              {fieldErrors.email}
+            </Form.Control.Feedback>
           </Form.Group>
           {!selectedUser && (
             <Form.Group className="mb-3">
@@ -69,9 +121,12 @@ function UserFormModal({ show, handleClose, handleSave, selectedUser }) {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                required
-                minLength={8}
+                placeholder="Mínimo 8 caracteres"
+                isInvalid={!!fieldErrors.password}
               />
+              <Form.Control.Feedback type="invalid">
+                {fieldErrors.password}
+              </Form.Control.Feedback>
             </Form.Group>
           )}
           <Form.Group className="mb-3">

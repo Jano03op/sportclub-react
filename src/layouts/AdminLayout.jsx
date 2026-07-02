@@ -12,7 +12,7 @@ export default function AdminLayout() {
           { to: '/admin/sports', label: 'Deportes' },
         ]}
         roleLabel="Admin"
-        profileTo="/admin/dashboard"
+        profileTo="/admin/profile"
       />
       <Container className="py-4 flex-grow-1">
         <Outlet />
