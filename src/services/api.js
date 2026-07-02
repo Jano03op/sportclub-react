@@ -41,10 +41,10 @@ export const usersApi = {
 };
 
 export const sportsApi = {
-  getAll: () => request('/sport'),
-  getById: (id) => request(`/sport/${id}`),
-  create: (body) => request('/sport', { method: 'POST', body: JSON.stringify(body) }),
-  update: (id, body) => request(`/sport/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
-  remove: (id) => request(`/sport/${id}`, { method: 'DELETE' }),
-  changeStatus: (id, status) => request(`/sport/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+  getAll: () => request('/sports'),
+  getById: (id) => request(`/sports/${id}`),
+  create: (body) => request('/sports', { method: 'POST', body: JSON.stringify(body) }),
+  update: (id, body) => request(`/sports/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+  remove: (id) => request(`/sports/${id}`, { method: 'DELETE' }),
+  changeStatus: (id, status) => request(`/sports/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
 };

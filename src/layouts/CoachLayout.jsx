@@ -8,7 +8,7 @@ export default function CoachLayout() {
       <DashboardNavbar
         links={[{ to: '/coach/dashboard', label: 'Dashboard' }]}
         roleLabel="Entrenador"
-        profileTo="/coach/dashboard"
+        profileTo="/coach/profile"
       />
       <Container className="py-4 flex-grow-1">
         <Outlet />
