@@ -144,7 +144,7 @@ export default function MyReservationsPage() {
                         {sportRoom?.sport?.name || '—'}
                       </td>
                       <td className="fw-semibold">{sportRoom?.room?.name || '—'}</td>
-                      <td>{sportRoom?.coach?.full_name || 'Sin asignar'}</td>
+                      <td>{sportRoom?.coach?.full_name || sportRoom?.coach?.email || 'Sin asignar'}</td>
                       <td>{dayName(schedule?.day_of_week)}</td>
                       <td className="text-center text-nowrap">
                         <Badge bg="info" text="dark">

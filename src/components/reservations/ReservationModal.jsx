@@ -12,7 +12,9 @@ export default function ReservationModal({ show, handleClose, handleSave, schedu
 
   const sportName = schedule.sportRoom?.sport?.name || 'Deporte';
   const roomName = schedule.sportRoom?.room?.name || 'Sala';
-  const coachName = schedule.sportRoom?.coach?.full_name || 'Sin asignar';
+  // Los endpoints de member solo exponen el email del coach (no full_name)
+  const coachName =
+    schedule.sportRoom?.coach?.full_name || schedule.sportRoom?.coach?.email || 'Sin asignar';
   const day = dayName(schedule.day_of_week);
   const timeSlot = `${formatTime(schedule.start_time)} – ${formatTime(schedule.end_time)}`;
 
@@ -20,12 +22,14 @@ export default function ReservationModal({ show, handleClose, handleSave, schedu
     e.preventDefault();
     setSubmitting(true);
     try {
+      // El backend hace observation.length al validar, por lo que enviar
+      // null lo rompe: siempre se envía string (vacío si no se escribió nada)
       await handleSave({
         class_schedule_id: schedule.id,
-        observation: observation.trim() || null,
+        observation: observation.trim(),
       });
       setObservation('');
-    } catch (error) {
+    } catch {
       // El error se manejará en el componente padre
     } finally {
       setSubmitting(false);
