@@ -8,20 +8,26 @@ import Button from 'react-bootstrap/Button';
 import Badge from 'react-bootstrap/Badge';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/useAuth';
-import { getMemberDashboard } from '../../services/memberService';
+import { getMemberDashboard, getMyReservations } from '../../services/memberService';
 import { showApiError } from '../../utils/alerts';
 
 export default function UserDashboard() {
   const { user } = useAuth();
   const [data, setData] = useState(null);
+  const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getMemberDashboard()
-      .then((dashboardData) => setData(dashboardData))
+    Promise.all([getMemberDashboard(), getMyReservations()])
+      .then(([dashboardData, reservationsData]) => {
+        setData(dashboardData);
+        setReservations(reservationsData);
+      })
       .catch((error) => showApiError(error, 'No se pudo cargar la información del panel'))
       .finally(() => setLoading(false));
   }, []);
+
+  const activeReservations = reservations.filter((res) => res.status === 'active').length;
 
   return (
     <>
@@ -78,11 +84,12 @@ export default function UserDashboard() {
               <Card className="h-100 shadow-sm text-center">
                 <Card.Header as="h5" className="bg-light">Mis Reservas</Card.Header>
                 <Card.Body className="d-flex flex-column justify-content-center align-items-center">
-                  <div className="my-3">
-                    <i className="bi bi-calendar2-check-fill text-success" style={{ fontSize: '3rem' }}></i>
-                  </div>
+                  <h1 className="display-4 fw-bold text-success mb-3">
+                    {activeReservations}
+                  </h1>
                   <Card.Text className="text-muted mb-4">
-                    Revisa tus reservas actuales, historial de asistencia y cancela si es necesario.
+                    {activeReservations === 1 ? 'Reserva activa' : 'Reservas activas'}.
+                    Revisa tu historial y cancela si es necesario.
                   </Card.Text>
                   <Button as={Link} to="/user/reservations" variant="success" size="sm" className="w-100 mt-auto">
                     Ver mis reservas

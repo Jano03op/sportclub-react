@@ -32,8 +32,12 @@ export default function AvailableClassesPage() {
   const [showModal, setShowModal] = useState(false);
   const [selectedSchedule, setSelectedSchedule] = useState(null);
 
-  const loadData = () => {
-    setLoading(true);
+  // Incrementarlo fuerza al efecto a recargar (ej: después de reservar)
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  // La carga vive dentro del efecto: se repite al cambiar los filtros y
+  // los setState solo ocurren en los callbacks de la promesa
+  useEffect(() => {
     const filters = {};
     if (selectedSport) filters.sport_id = selectedSport;
     if (selectedRoom) filters.room_id = selectedRoom;
@@ -50,11 +54,7 @@ export default function AvailableClassesPage() {
       })
       .catch((error) => showApiError(error, 'No se pudo cargar la información de clases'))
       .finally(() => setLoading(false));
-  };
-
-  useEffect(() => {
-    loadData();
-  }, [selectedSport, selectedRoom]);
+  }, [selectedSport, selectedRoom, refreshKey]);
 
   const openReservationModal = (schedule, cls) => {
     // Adjuntamos datos adicionales para mostrar info completa en el modal
@@ -84,7 +84,7 @@ export default function AvailableClassesPage() {
         confirmButtonColor: '#3085d6',
       });
       closeReservationModal();
-      loadData(); // Recargamos para reflejar el estado actual
+      setRefreshKey((key) => key + 1); // Recargamos para reflejar el estado actual
     } catch (error) {
       showApiError(error, 'No se pudo completar tu reserva');
       throw error;
@@ -170,7 +170,8 @@ export default function AvailableClassesPage() {
                     </Card.Text>
 
                     <div className="mb-3 p-2 bg-light rounded small">
-                      <strong>Entrenador:</strong> {cls.coach?.full_name || 'Sin asignar'}
+                      <strong>Entrenador:</strong>{' '}
+                      {cls.coach?.full_name || cls.coach?.email || 'Sin asignar'}
                     </div>
 
                     <h6 className="fw-bold text-dark border-bottom pb-1 small">Horarios Disponibles</h6>

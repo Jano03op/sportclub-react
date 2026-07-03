@@ -1,4 +1,7 @@
-const BASE_URL = 'http://localhost:3000/api';
+// En desarrollo apunta al backend local. En producción, Vite reemplaza
+// VITE_API_URL con el valor de .env.production ("/api", ruta relativa que
+// nginx redirige al backend), así la IP pública puede cambiar sin recompilar.
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 export function getToken() {
   return localStorage.getItem('token');
