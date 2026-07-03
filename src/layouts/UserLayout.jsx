@@ -6,7 +6,11 @@ export default function UserLayout() {
   return (
     <div className="theme-user d-flex flex-column min-vh-100">
       <DashboardNavbar
-        links={[{ to: '/user/dashboard', label: 'Dashboard' }]}
+        links={[
+          { to: '/user/dashboard', label: 'Dashboard' },
+          { to: '/user/classes', label: 'Clases Disponibles' },
+          { to: '/user/reservations', label: 'Mis Reservas' },
+        ]}
         roleLabel="Usuario"
         profileTo="/user/profile"
       />

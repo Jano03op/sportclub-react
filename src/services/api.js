@@ -81,3 +81,31 @@ export const schedulesApi = {
   update: (id, body) => request(`/class-schedules/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
   remove: (id) => request(`/class-schedules/${id}`, { method: 'DELETE' }),
 };
+
+export const coachApi = {
+  getDashboard: () => request('/coach/dashboard'),
+  getMyClasses: () => request('/coach/my-classes'),
+  getMySchedules: () => request('/coach/my-schedules'),
+  getMyRooms: () => request('/coach/my-rooms'),
+};
+
+export const memberApi = {
+  getDashboard: () => request('/member/dashboard'),
+  getClasses: (filters = {}) => {
+    const params = new URLSearchParams(filters).toString();
+    return request(`/member/classes${params ? `?${params}` : ''}`);
+  },
+  getClassById: (id) => request(`/member/classes/${id}`),
+  getSports: () => request('/member/sports'),
+  getRooms: () => request('/member/rooms'),
+};
+
+export const reservationsApi = {
+  getAll: (filters = {}) => {
+    const params = new URLSearchParams(filters).toString();
+    return request(`/reservations${params ? `?${params}` : ''}`);
+  },
+  getMyReservations: () => request('/reservations/my-reservations'),
+  create: (body) => request('/reservations', { method: 'POST', body: JSON.stringify(body) }),
+  cancel: (id) => request(`/reservations/${id}/cancel`, { method: 'PATCH' }),
+};

@@ -6,7 +6,11 @@ export default function CoachLayout() {
   return (
     <div className="theme-coach d-flex flex-column min-vh-100">
       <DashboardNavbar
-        links={[{ to: '/coach/dashboard', label: 'Dashboard' }]}
+        links={[
+          { to: '/coach/dashboard', label: 'Dashboard' },
+          { to: '/coach/classes', label: 'Mis Clases' },
+          { to: '/coach/schedule', label: 'Mi Horario' },
+        ]}
         roleLabel="Entrenador"
         profileTo="/coach/profile"
       />

@@ -7,7 +7,13 @@ import Recover from '../pages/Recover';
 import ProfilePage from '../pages/ProfilePage';
 
 import UserDashboard from '../pages/user/UserDashboard';
+import AvailableClassesPage from '../pages/user/AvailableClassesPage';
+import MyReservationsPage from '../pages/user/MyReservationsPage';
+
 import CoachDashboard from '../pages/coach/CoachDashboard';
+import MyClassesPage from '../pages/coach/MyClassesPage';
+import MySchedulePage from '../pages/coach/MySchedulePage';
+
 import AdminDashboard from '../pages/admin/AdminDashboard';
 import UsersPage from '../pages/admin/UsersPage';
 import SportsPage from '../pages/admin/SportsPage';
@@ -39,6 +45,8 @@ export default function AppRoutes() {
           }
         >
           <Route path="dashboard" element={<UserDashboard />} />
+          <Route path="classes" element={<AvailableClassesPage />} />
+          <Route path="reservations" element={<MyReservationsPage />} />
           <Route path="profile" element={<ProfilePage />} />
         </Route>
 
@@ -51,6 +59,8 @@ export default function AppRoutes() {
           }
         >
           <Route path="dashboard" element={<CoachDashboard />} />
+          <Route path="classes" element={<MyClassesPage />} />
+          <Route path="schedule" element={<MySchedulePage />} />
           <Route path="profile" element={<ProfilePage />} />
         </Route>
 

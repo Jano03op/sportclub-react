@@ -5,6 +5,7 @@ Aplicación web SPA desarrollada con React para la gestión del club deportivo S
 ## Integrantes
 
 - Alejandro Aracena
+- Joaquín Pizarro
 
 ## Tecnologías utilizadas
 
@@ -81,9 +82,18 @@ El backend estará disponible en `http://localhost:3000`.
 - Actualización automática en pantalla tras cada operación
 
 ### Dashboards
-- Dashboard Usuario (tema azul)
-- Dashboard Coach (tema verde)
+- Dashboard Usuario (tema azul) - Carga datos dinámicos y clases sugeridas
+- Dashboard Coach (tema verde) - Carga estadísticas reales y próxima clase activa
 - Dashboard Administrador (tema morado)
+
+### Módulos del Coach
+- **Mis Clases:** Consulta y listado de clases y asignaciones activas a cargo del coach.
+- **Mi Horario:** Agenda cronológica de clases asignadas en salas.
+
+### Módulos del Usuario (Miembro)
+- **Clases Disponibles:** Filtros dinámicos de búsqueda por Deporte y por Sala.
+- **Crear Reserva:** Proceso de agendamiento de horas con modal de observaciones opcionales.
+- **Mis Reservas / Cancelación:** Historial personal de reservas con posibilidad de cancelaciones utilizando alertas de SweetAlert2.
 
 ## Estructura del proyecto
 
@@ -155,3 +165,19 @@ src/
 | PUT | `/api/sport/:id` | Actualizar deporte |
 | DELETE | `/api/sport/:id` | Eliminar deporte |
 | PATCH | `/api/sport/:id/status` | Cambiar estado |
+
+### Coach (Entrenador)
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| GET | `/api/coach/dashboard` | Métricas y siguiente clase del coach |
+| GET | `/api/coach/my-classes` | Listar clases asignadas |
+| GET | `/api/coach/my-schedules` | Listar bloques horarios asignados |
+
+### Miembro (Usuario) y Reservas
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| GET | `/api/member/dashboard` | Métricas y clases sugeridas del usuario |
+| GET | `/api/member/classes` | Buscar y filtrar clases disponibles |
+| GET | `/api/reservations/my-reservations` | Historial de reservas del usuario |
+| POST | `/api/reservations` | Crear nueva reserva en un horario |
+| PATCH | `/api/reservations/:id/cancel` | Cancelar reserva activa |
