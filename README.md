@@ -2,19 +2,23 @@
 
 Aplicación web SPA desarrollada con React para la gestión del club deportivo SportClub.
 
-## Integrantes
+**🌐 Aplicación desplegada en AWS:** http://34.195.133.17
 
-- Alejandro Aracena
-- Joaquín Pizarro
+## Integrantes y distribución de flujos
+
+| Integrante | Flujos desarrollados |
+|---|---|
+| **Alejandro Aracena** | 1. Gestión de Salas · 2. Gestión de Asignaciones · 3. Gestión de Horarios · 8. Mis Reservas / Cancelar Reserva — base obligatoria (login, registro, gestión de usuarios y deportes, rutas protegidas, roles y Mi Perfil) |
+| **Joaquín Pizarro** | 4. Mis Clases (coach) · 5. Mi Horario (coach) · 6. Clases Disponibles · 7. Crear Reserva |
 
 ## Tecnologías utilizadas
 
-- React 19
-- Vite
-- React Router DOM
+- React 19 + Vite
+- React Router DOM (rutas anidadas y protegidas por rol)
 - React-Bootstrap + Bootstrap 5
-- SweetAlert2
-- Context API (autenticación)
+- SweetAlert2 (confirmaciones y retroalimentación de errores)
+- Context API (autenticación con JWT)
+- Fetch API centralizado (`services/api.js`)
 
 ## Requisitos previos
 
@@ -22,34 +26,35 @@ Aplicación web SPA desarrollada con React para la gestión del club deportivo S
 - pnpm (o npm/yarn)
 - Backend SportClub ejecutándose en `http://localhost:3000`
 
-## Instalación de dependencias
+## Instalación y ejecución
 
 ```bash
 pnpm install
-```
-
-## Cómo ejecutar el frontend
-
-```bash
 pnpm dev
 ```
 
 La aplicación estará disponible en `http://localhost:5173`.
 
-## Cómo ejecutar el backend
+### Backend (repositorio del docente)
 
 ```bash
-# Ingresar al directorio del backend
-cd ../Backend-SportClub-E3
-
-# Instalar dependencias
+# Opción 1: Node local
+cd ../FrontEnd-Backend-ClubDeportivo
 npm install
-
-# Ejecutar el servidor
 npm run dev
+
+# Opción 2: Docker (backend + MariaDB)
+docker compose up -d --build
 ```
 
 El backend estará disponible en `http://localhost:3000`.
+
+### Configuración de la URL de la API
+
+`services/api.js` usa la variable `VITE_API_URL`:
+
+- **Desarrollo:** no requiere configuración (usa `http://localhost:3000/api`).
+- **Producción:** [.env.production](.env.production) define `VITE_API_URL=/api` (ruta relativa). En AWS, nginx redirige `/api` al backend, por lo que un cambio de IP pública **no** requiere recompilar.
 
 ## Usuarios de prueba
 
@@ -59,125 +64,134 @@ El backend estará disponible en `http://localhost:3000`.
 | coach1@demo.cl | 12345678 | Coach |
 | user1@demo.cl | 12345678 | Usuario |
 
+(También existen `admin2`, `coach2` y `user2` con la misma contraseña.)
+
 ## Módulos implementados
 
-### Autenticación
-- Login con persistencia de sesión (token en localStorage)
-- Registro de cuenta con campo de fecha de nacimiento (opcional)
-- Cierre de sesión
-- Rutas protegidas por rol mediante `RoleRoute`
+### Base obligatoria
+- **Login** con persistencia de sesión (token JWT en localStorage) y expiración manejada.
+- **Registro** de cuenta con validaciones en línea campo a campo.
+- **Gestión de Usuarios** *(admin)*: CRUD completo con filtro por rol y buscador.
+- **Gestión de Deportes** *(admin)*: CRUD con switch de estado activo/inactivo y fechas formateadas.
+- **Rutas protegidas** por rol mediante `RoleRoute` + layouts por rol con tema visual propio.
+- **Mi Perfil** (los tres roles): edición de datos personales y cambio de contraseña.
 
-### Gestión de Usuarios *(solo Administrador)*
-- Listar, crear, editar y eliminar usuarios
-- Modal React-Bootstrap para crear y editar
-- SweetAlert2 para confirmaciones y notificaciones
+### Flujos de Administración
+- **Gestión de Salas:** CRUD con capacidad, ubicación y observaciones.
+- **Gestión de Asignaciones:** vincula Deporte + Sala + Coach; detecta duplicados (409) y muestra la cantidad de horarios asociados.
+- **Gestión de Horarios:** bloques por día de la semana (1–7) y rango horario validado; filtro por día.
+- **Dashboard Admin:** estadísticas en vivo de los 5 módulos, clases del día y resumen del sistema.
 
-### Gestión de Deportes *(solo Administrador)*
-- Listar deportes en tabla con: Nombre, Objetivo, Duración, Estado, Fecha de creación
-- Fechas formateadas como `15 de Julio de 2026`
-- Crear y editar mediante Modal React-Bootstrap con validaciones
-- Eliminar con confirmación SweetAlert2
-- Cambio de estado activo/inactivo con Switch directamente desde el listado
-- Botón Refrescar para recargar datos desde la API
-- Actualización automática en pantalla tras cada operación
+### Flujos del Coach
+- **Mis Clases:** listado de asignaciones activas a cargo del coach autenticado (identificado por su token).
+- **Mi Horario:** agenda de bloques horarios con filtros por día y búsqueda.
+- **Dashboard Coach:** métricas reales y siguiente clase programada.
 
-### Dashboards
-- Dashboard Usuario (tema azul) - Carga datos dinámicos y clases sugeridas
-- Dashboard Coach (tema verde) - Carga estadísticas reales y próxima clase activa
-- Dashboard Administrador (tema morado)
+### Flujos del Usuario (Miembro)
+- **Clases Disponibles:** filtros server-side por deporte y sala (query params).
+- **Crear Reserva:** modal con resumen de la clase y observación opcional; maneja duplicados (409).
+- **Mis Reservas / Cancelar:** historial personal con filtro por estado; la cancelación es un `PATCH` (soft-cancel) que conserva el registro.
+- **Dashboard Usuario:** clases sugeridas y reservas activas.
 
-### Módulos del Coach
-- **Mis Clases:** Consulta y listado de clases y asignaciones activas a cargo del coach.
-- **Mi Horario:** Agenda cronológica de clases asignadas en salas.
-
-### Módulos del Usuario (Miembro)
-- **Clases Disponibles:** Filtros dinámicos de búsqueda por Deporte y por Sala.
-- **Crear Reserva:** Proceso de agendamiento de horas con modal de observaciones opcionales.
-- **Mis Reservas / Cancelación:** Historial personal de reservas con posibilidad de cancelaciones utilizando alertas de SweetAlert2.
+### Experiencia de usuario
+- Design system propio sobre Bootstrap (`src/index.css`): tipografía Lexend, paleta púrpura/dorado, capas tonales sin bordes, acento de color por rol.
+- Validación en dos capas: en línea bajo cada campo (antes de enviar) + errores del backend listados en SweetAlert2.
+- Estados de carga (spinners), estados vacíos descriptivos y actualización automática de la interfaz tras cada operación.
+- Diseño responsive (navbar colapsable, tablas con scroll, cards apilables).
 
 ## Estructura del proyecto
 
 ```
 src/
-├── assets/
-│   └── logo_empresa_letra_v1.png
+├── assets/                     # Logo e imágenes
 ├── components/
-│   ├── navigation/
-│   │   └── DashboardNavbar.jsx
-│   ├── sports/
-│   │   └── SportFormModal.jsx
-│   └── users/
-│       └── UserFormModal.jsx
-├── context/
-│   ├── AuthContext.jsx
-│   └── useAuth.js
-├── layouts/
-│   ├── AdminLayout.jsx
-│   ├── CoachLayout.jsx
-│   └── UserLayout.jsx
+│   ├── navigation/DashboardNavbar.jsx
+│   ├── users/UserFormModal.jsx
+│   ├── sports/SportFormModal.jsx
+│   ├── rooms/RoomFormModal.jsx
+│   ├── assignments/AssignmentFormModal.jsx
+│   ├── schedules/ScheduleFormModal.jsx
+│   └── reservations/ReservationModal.jsx
+├── context/                    # AuthContext + hook useAuth
+├── layouts/                    # AdminLayout / CoachLayout / UserLayout
 ├── pages/
-│   ├── Home.jsx
-│   ├── Login.jsx
-│   ├── Register.jsx
-│   ├── Recover.jsx
-│   ├── admin/
-│   │   ├── AdminDashboard.jsx
-│   │   ├── SportsPage.jsx
-│   │   └── UsersPage.jsx
-│   ├── coach/
-│   │   └── CoachDashboard.jsx
-│   └── user/
-│       └── UserDashboard.jsx
-├── routes/
-│   ├── AppRoutes.jsx
-│   └── RoleRoute.jsx
-├── services/
-│   ├── api.js
-│   ├── authService.js
-│   ├── sportService.js
-│   └── userService.js
+│   ├── Home.jsx · Login.jsx · Register.jsx · Recover.jsx · ProfilePage.jsx
+│   ├── admin/                  # Dashboard, Users, Sports, Rooms, Assignments, Schedules
+│   ├── coach/                  # Dashboard, MyClasses, MySchedule
+│   └── user/                   # Dashboard, AvailableClasses, MyReservations
+├── routes/                     # AppRoutes + RoleRoute
+├── services/                   # api.js (fetch central) + un servicio por módulo
+├── utils/                      # alerts.js · schedule.js · format.js
 ├── App.jsx
 └── main.jsx
 ```
 
 ## Endpoints consumidos
 
-### Autenticación
+### Autenticación y perfil
 | Método | Ruta | Descripción |
 |--------|------|-------------|
 | POST | `/api/auth/login` | Iniciar sesión |
 | POST | `/api/auth/register` | Registrar cuenta |
 | GET | `/api/auth/me` | Obtener usuario autenticado |
+| PUT | `/api/auth/me` | Actualizar perfil propio |
+| PUT | `/api/auth/me/password` | Cambiar contraseña |
 
-### Usuarios
+### Usuarios (admin)
 | Método | Ruta | Descripción |
 |--------|------|-------------|
-| GET | `/api/users` | Listar usuarios |
+| GET | `/api/users` | Listar usuarios (`?role=` para filtrar) |
 | POST | `/api/users` | Crear usuario |
 | PUT | `/api/users/:id` | Actualizar usuario |
 | DELETE | `/api/users/:id` | Eliminar usuario |
 
-### Deportes
+### Deportes (admin)
 | Método | Ruta | Descripción |
 |--------|------|-------------|
-| GET | `/api/sport` | Listar deportes |
-| POST | `/api/sport` | Crear deporte |
-| PUT | `/api/sport/:id` | Actualizar deporte |
-| DELETE | `/api/sport/:id` | Eliminar deporte |
-| PATCH | `/api/sport/:id/status` | Cambiar estado |
+| GET / POST | `/api/sports` | Listar / crear deportes |
+| PUT / DELETE | `/api/sports/:id` | Actualizar / eliminar deporte |
+| PATCH | `/api/sports/:id/status` | Cambiar estado |
 
-### Coach (Entrenador)
+### Salas, Asignaciones y Horarios (admin)
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| GET / POST | `/api/rooms` | Listar / crear salas |
+| PUT / DELETE | `/api/rooms/:id` | Actualizar / eliminar sala |
+| GET / POST | `/api/sport-rooms` | Listar / crear asignaciones (Deporte+Sala+Coach) |
+| PUT / DELETE | `/api/sport-rooms/:id` | Actualizar / eliminar asignación |
+| GET / POST | `/api/class-schedules` | Listar / crear horarios |
+| PUT / DELETE | `/api/class-schedules/:id` | Actualizar / eliminar horario |
+
+### Coach
 | Método | Ruta | Descripción |
 |--------|------|-------------|
 | GET | `/api/coach/dashboard` | Métricas y siguiente clase del coach |
-| GET | `/api/coach/my-classes` | Listar clases asignadas |
-| GET | `/api/coach/my-schedules` | Listar bloques horarios asignados |
+| GET | `/api/coach/my-classes` | Clases asignadas al coach autenticado |
+| GET | `/api/coach/my-schedules` | Bloques horarios del coach |
 
-### Miembro (Usuario) y Reservas
+### Miembro y Reservas
 | Método | Ruta | Descripción |
 |--------|------|-------------|
-| GET | `/api/member/dashboard` | Métricas y clases sugeridas del usuario |
-| GET | `/api/member/classes` | Buscar y filtrar clases disponibles |
+| GET | `/api/member/dashboard` | Métricas y clases sugeridas |
+| GET | `/api/member/classes` | Clases disponibles (`?sport_id=&room_id=`) |
+| GET | `/api/member/sports` · `/api/member/rooms` | Catálogos activos para filtros |
 | GET | `/api/reservations/my-reservations` | Historial de reservas del usuario |
-| POST | `/api/reservations` | Crear nueva reserva en un horario |
+| POST | `/api/reservations` | Crear reserva en un horario |
 | PATCH | `/api/reservations/:id/cancel` | Cancelar reserva activa |
+
+## Despliegue en AWS
+
+La aplicación corre en una instancia **EC2 (Amazon Linux 2023)** con IP elástica:
+
+```
+Navegador ── http://34.195.133.17 (puerto 80)
+              [ nginx ]
+               ├── /        → build de Vite (dist/) con fallback a index.html (React Router)
+               └── /api/... → proxy inverso → backend en localhost:3000
+                                  [ Docker Compose ]
+                                  ├── club_backend (Node/Express)
+                                  └── club_mariadb (MariaDB 11)
+```
+
+- El backend y la base de datos corren con `docker compose` (`restart: always`), y nginx está habilitado como servicio: **todo se levanta automáticamente** al encender la instancia.
+- Solo los puertos 22 (SSH) y 80 (HTTP) están abiertos en el Security Group; el 3000 no se expone públicamente.
